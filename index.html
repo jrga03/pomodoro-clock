@@ -161,7 +161,28 @@
 <body>
   <div id="container">
     <h1>Pomodoro Clock</h1>
-    <button>asdasd</button>
+    
+    <button id="timer">
+      <div id="timer-fill"></div>
+      <div id="timer-title"><p>Focus!</p></div><br>
+      <div id="clock"><p id="minutes">25</p><span>:</span><p id="seconds">00</p></div>
+    </button>
+    
+    <br>  
+    <div id="session">
+      <p id="session-title">Session Length</p>
+      <button class="plus-minus" id="session-minus">-</button>
+      <p id="session-time">25</p>
+      <button class="plus-minus" id="session-plus">+</button>
+    </div>
+    <div id="break">
+      <p id="break-title">Break Length</p>
+      <button class="plus-minus" id="break-minus">-</button>
+      <p id="break-time">5</p>
+      <button class="plus-minus" id="break-plus">+</button>
+    </div>
+    <br>
+    <button id="reset">Reset</button>
   </div>
 </body>
 </html>
