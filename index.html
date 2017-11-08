@@ -8,6 +8,154 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="pomodoro-style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    'use strict'
+    var sessionLength = 25;
+    var breakLength = 5;
+    var lengthInMsecs = sessionLength * 1000 * 60;
+    var type = "session"; // session or break
+    var status = "paused"; // ongoing or paused
+    var timer, percentDiff, buttonFill, sessionBase, breakBase, marginTop, marginLeft;
+    var buttonSize = 349;
+    var alarm = new Audio("https://actions.google.com/sounds/v1/emergency/beeper_emergency_call.ogg");
+    
+    $(document).ready(function() {
+      
+      $("#timer").on("click", function() {
+        if (status === "paused") {
+          timer = setInterval(countdown, 1000);
+          status = "ongoing";
+
+        } else if (status === "ongoing") {
+          clearInterval(timer);
+          timer = false;
+          status = "paused";
+        }
+      })
+  
+      $("#session-minus").on("click", function() {
+        if (!timer) {
+          if (sessionLength > 1) {
+            sessionLength -= 1;
+            $("#session-time").text(sessionLength);
+          }
+          updateTimer();
+        }
+      })
+  
+      $("#session-plus").on("click", function() {
+        if (!timer) {
+          if (sessionLength < 60) {
+            sessionLength += 1;
+            $("#session-time").text(sessionLength);
+          }
+          updateTimer();
+        }
+      })
+  
+      $("#break-minus").on("click", function() {
+        if (!timer) {
+          if (breakLength > 1) {
+            breakLength -= 1;
+            $("#break-time").text(breakLength);
+          }
+          updateTimer();
+        }    
+      })
+  
+      $("#break-plus").on("click", function() {
+        if (!timer) {
+          if (breakLength < 60) {
+            breakLength += 1;
+            $("#break-time").text(breakLength);
+          }
+          updateTimer();
+        }    
+      })
+      
+      $("#reset").on("click", function() {
+        clearInterval(timer);
+        lengthInMsecs = sessionLength * 1000 * 60;
+        type = "session";
+        status = "paused";
+        timer = false;
+        
+        $("#minutes").text(sessionLength);
+        $("#seconds").text("00");
+        $("#timer-title p").text("Focus!");
+        $("#timer-fill").css({"height":"100%", "width":"100%", "background":"green", "margin":"-50% auto auto auto"});
+      })
+    })
+
+    function countdown() {
+      if (type === "session") {
+        lengthInMsecs -= 1000;
+        var lengthInMinutes = Math.floor(lengthInMsecs % (1000 * 60 * 60) / (1000 * 60));
+        var lengthInSec = Math.floor(lengthInMsecs % (1000 * 60) / 1000);
+        
+        $("#minutes").text(lengthInMinutes);
+        if (lengthInSec < 10) {
+          $("#seconds").text('0' + lengthInSec);
+        } else {
+          $("#seconds").text(lengthInSec);
+        }
+        
+        sessionBase = sessionLength * 1000 * 60;
+        percentDiff = lengthInMsecs/sessionBase;
+        buttonFill = percentDiff*100 + "%";
+        marginTop = "-" + (percentDiff*100)/2 + "%";
+        marginLeft = (100-(percentDiff*100))/2 + "%";
+        $("#timer-fill").css({"width":buttonFill, "height":buttonFill, "background":"green", "margin-top":marginTop, "margin-left":marginLeft});
+        
+        if (lengthInMsecs < 0) {
+          alarm.play();
+          $("#timer-title p").text("Break");
+          lengthInMsecs = breakLength * 1000 * 60;
+          type = "break";
+          countdown();
+        }
+      } else if (type === "break") {
+        lengthInMsecs -= 1000;
+        var lengthInMinutes = Math.floor(lengthInMsecs % (1000 * 60 * 60) / (1000 * 60));
+        var lengthInSec = Math.floor(lengthInMsecs % (1000 * 60) / 1000);
+        
+        $("#minutes").text(lengthInMinutes);
+        if (lengthInSec < 10) {
+          $("#seconds").text('0' + lengthInSec);
+        } else {
+          $("#seconds").text(lengthInSec);
+        }
+        
+        breakBase = breakLength * 1000 * 60;
+        percentDiff = lengthInMsecs/breakBase;
+        buttonFill = percentDiff*100 + "%";
+        marginTop = "-" + (percentDiff*100)/2 + "%";
+        marginLeft = (100-(percentDiff*100))/2 + "%";
+        $("#timer-fill").css({"width":buttonFill, "height":buttonFill, "background":"brown", "margin-top":marginTop, "margin-left":marginLeft});
+        
+        if (lengthInMsecs < 0) {
+          alarm.play();      
+          $("#timer-title p").text("Focus!");
+          lengthInMsecs = sessionLength * 1000 * 60;
+          type = "session";
+          countdown();
+        }
+      }  
+    }
+
+    function updateTimer() {
+      lengthInMsecs = sessionLength * 1000 * 60;
+      clearInterval(timer);
+      $("#minutes").text(sessionLength);
+      $("#seconds").text("00");
+      $("#timer-fill").css({"width":"100%", "height":"100%", "background":"green", "margin":"-50% auto auto auto"});
+      if (type === "break") {
+        type = "session";
+        $("#timer-title").text("Focus!");
+      }
+    }
+
+  </script>
 </head>
 
 <body>
